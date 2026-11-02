@@ -1,0 +1,122 @@
+classDiagram
+    direction TB
+
+    class Person {
+        -_first_name: str
+        -_last_name: str
+        -_address: str
+        +first_name: str «property»
+        +last_name: str «property»
+        +address: str «property»
+        +full_name: str «read-only»
+    }
+
+    class Customer {
+        +customer_id: str
+        +account_ids: list
+        +loan_ids: list
+        +card_ids: list
+        +to_dict() dict
+        +from_dict(data) Customer
+    }
+
+    class Employee {
+        +employee_id: str
+        +position: str
+        -_salary: float
+        +salary: float «property»
+        +to_dict() dict
+    }
+
+    class Account {
+        +account_id: str
+        +customer_id: str
+        -_balance: float
+        +transactions: list
+        +balance: float «read-only»
+        +deposit(amount) float
+        +withdraw(amount) float
+        +available_funds() float
+        +to_dict() dict
+    }
+
+    class CheckingAccount {
+        +overdraft_limit: float
+        +available_funds() float
+    }
+
+    class SavingsAccount {
+        -_interest_rate: float
+        +interest_rate: float «property»
+        +apply_interest() float
+    }
+
+    class Loan {
+        +loan_id: str
+        +customer_id: str
+        +principal: float
+        +interest_rate: float
+        +term_months: int
+        +remaining_balance: float
+        +status: str
+        +monthly_payment: float «read-only»
+        +make_payment(amount) float
+    }
+
+    class CreditCard {
+        +card_id: str
+        +customer_id: str
+        +credit_limit: float
+        +balance: float
+        +available_credit: float «read-only»
+        +charge(amount) float
+        +pay(amount) float
+    }
+
+    class Bank {
+        +name: str
+        +data_file: str
+        +customers: dict
+        +employees: dict
+        +accounts: dict
+        +loans: dict
+        +credit_cards: dict
+        +save()
+        +load()
+        +add_customer(...) Customer
+        +add_employee(...) Employee
+        +open_account(...) Account
+        +deposit(id, amount) float
+        +withdraw(id, amount) float
+        +transfer(from_id, to_id, amount)
+        +issue_loan(...) Loan
+        +issue_credit_card(...) CreditCard
+        +customer_summary(id) str
+    }
+
+    class BankCLI {
+        +bank: Bank
+        +menu: dict
+        +run()
+    }
+
+    class BankError {
+        <<exception>>
+    }
+
+    Person <|-- Customer
+    Person <|-- Employee
+    Account <|-- CheckingAccount
+    Account <|-- SavingsAccount
+
+    Bank "1" *-- "*" Customer
+    Bank "1" *-- "*" Employee
+    Bank "1" *-- "*" Account
+    Bank "1" *-- "*" Loan
+    Bank "1" *-- "*" CreditCard
+    BankCLI --> Bank : uses
+
+    Customer "1" -- "*" Account : owns
+    Customer "1" -- "*" Loan : borrows
+    Customer "1" -- "*" CreditCard : holds
+    Bank ..> BankError : raises
